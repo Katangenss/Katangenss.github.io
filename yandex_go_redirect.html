@@ -4,16 +4,27 @@
 <title>Перенаправление в Яндекс Go</title>
 <script>
   function tryOpenYandexGo() {
-    var appUrl = "yandexmaps://?ll=37.606936,55.578439&z=17&pt=37.606936,55.578439~Дорожная улица, 60с31";
-    var webUrl = "https://yandex.ru/maps/?ll=37.606936,55.578439&mode=search&ol=biz&text=Дорожная улица, 60с31&z=17";
+    var userAgent = navigator.userAgent.toLowerCase();
+    var isIOS = /iphone|ipad|ipod/.test(userAgent);
 
-    // Попробуем открыть Яндекс Go
-    window.location.href = appUrl;
+    var latitude = 55.578493;
+    var longitude = 37.606945;
 
-    // Если Яндекс Go не открылся через 2 секунды, перенаправляем на Яндекс Карты в браузере
-    setTimeout(function() {
-      window.location.href = webUrl;
-    }, 2000);
+    var androidUrl = "https://taxi.yandex.ru/order?gfrom=&gto=" + latitude + "," + longitude + "&tariff=econom&lang=ru&utm_source=yamaps&utm_medium=2334692&ref=2334692";
+    var iosUrl = "yandexmaps://?ll=" + longitude + "," + latitude + "&z=17&pt=" + longitude + "," + latitude; // Попробуем URL-схему для iOS, но нет гарантий
+
+    if (isIOS) {
+      // Попытка открыть приложение на iOS
+      window.location.href = iosUrl;
+
+      // Если не удалось открыть приложение через 2 секунды, перенаправляем на веб-сайт
+      setTimeout(function() {
+        window.location.href = androidUrl; // Используем веб-ссылку и для iOS, если не удалось открыть приложение
+      }, 2000);
+    } else {
+      // Открываем ссылку для Android
+      window.location.href = androidUrl;
+    }
   }
 
   window.onload = tryOpenYandexGo;
